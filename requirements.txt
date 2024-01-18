@@ -1,0 +1,7 @@
+pytest
+typer[all]
+pylint
+numpy
+matplotlib
+scikit-learn
+notebook
