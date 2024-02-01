@@ -1,14 +1,8 @@
 """
 test for decision tree
 """
-import typer
 import numpy as np
-from sklearn import datasets
-from sklearn.model_selection import train_test_split
 from collections import Counter
-
-
-app = typer.Typer(pretty_exceptions_show_locals=False)
 
 class TreeNode:
     def __init__(self, feature=None, threshold=None, left=None, right=None, *, value=None):
@@ -21,12 +15,12 @@ class TreeNode:
     def is_leaf_node(self):
         return self.value is not None
 
-class DecissionTree:
+class DecisionTree:
     """
-        Decission Tree Class
+        Decision Tree Class
     """
-    def __init__(self, min_sample_split=2, max_depth=100, n_features=None):
-        self.min_sample_split = min_sample_split
+    def __init__(self, min_samples_split=2, max_depth=100, n_features=None):
+        self.min_samples_split = min_samples_split
         self.max_depth = max_depth
         self.n_features = n_features
         self.root = None
@@ -94,7 +88,7 @@ class DecissionTree:
         n_labels = len(np.unique(y_train))
 
         # terminate criterion
-        if depth >= self.max_depth or n_samples <= self.min_sample_split or n_labels == 1:
+        if depth >= self.max_depth or n_samples <= self.min_samples_split or n_labels == 1:
             leaf_value = self._most_common_label(y_train)
             return TreeNode(value=leaf_value)
 
@@ -125,30 +119,5 @@ class DecissionTree:
         else:
             return self._traverse_tree(x, node.right)
 
-
     def predict(self, x_test):
         return np.array([self._traverse_tree(x, self.root) for x in x_test])
-
-
-@app.command()
-def build_dt():
-    data = datasets.load_breast_cancer()
-
-    x, y = data.data, data.target
-
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1234)
-
-    clf = DecissionTree(max_depth=10)
-    clf.fit(x_train, y_train)
-
-    predictions = clf.predict(x_test)
-
-    def accuracy(y_test, y_pred):
-        return np.sum(y_test == y_pred) / len(y_test)
-
-    acc = accuracy(y_test, predictions)
-    print(acc)
-
-
-if __name__ == '__main__':
-    app()
